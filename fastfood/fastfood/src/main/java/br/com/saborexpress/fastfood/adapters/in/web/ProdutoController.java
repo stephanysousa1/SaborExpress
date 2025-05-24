@@ -1,6 +1,10 @@
 package br.com.saborexpress.fastfood.adapters.in.web;
 
 import br.com.saborexpress.fastfood.adapters.out.persistence.ProdutoEntity;
+import br.com.saborexpress.fastfood.application.port.in.CreateProdutoUseCase;
+import br.com.saborexpress.fastfood.application.port.in.DeleteProdutoUseCase;
+import br.com.saborexpress.fastfood.application.port.in.GetProdutoUseCase;
+import br.com.saborexpress.fastfood.application.port.in.UpdateProdutoUseCase;
 import br.com.saborexpress.fastfood.application.port.out.ProdutoRepository;
 import br.com.saborexpress.fastfood.domain.Produto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/produtos")
@@ -16,67 +21,19 @@ import java.util.List;
 
 public class ProdutoController {
 
-    @Autowired
-    ProdutoRepository produtoRepository;
+   @Autowired
+    private CreateProdutoUseCase createProdutoUseCase;
+   @Autowired
+    private DeleteProdutoUseCase deleteProdutoUseCase;
+   @Autowired
+    private GetProdutoUseCase getProdutoUseCase;
+   @Autowired
+    private UpdateProdutoUseCase updateProdutoUseCase;
 
-    @GetMapping
-    public List<ProdutoEntity> listarProdutos() {
-        List<ProdutoEntity> produtos = produtoRepository.findAll();
-        return produtos;
-    }
-    @GetMapping("/{id}")
-    public ResponseEntity<Produto> obterProduto(@PathVariable Long id) {
-
-        ProdutoEntity produtoEntity = produtoRepository.getReferenceById(id);
-
-        if(produtoEntity != null) {
-            Produto produto = new Produto(produtoEntity.getId(), produtoEntity.getNome(), produtoEntity.getCategoria(),produtoEntity.getDescricao(), produtoEntity.getPreco(),
-                    produtoEntity.getFotoBase64(), produtoEntity.getDataCadastro(), produtoEntity.isAtivo() );
-            return new ResponseEntity<>(produto, HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    @PostMapping
-    public ResponseEntity<Produto> criarProduto(@RequestBody Produto produto) {
-        ProdutoEntity produtoEntity = new ProdutoEntity();
-        produtoEntity.setNome(produto.getNome());
-        produtoEntity.setCategoria(produto.getCategoria());
-        produtoEntity.setDescricao(produto.getDescricao());
-        produtoEntity.setPreco(produto.getPreco());
-        produtoEntity.setFotoBase64(produto.getFotoBase64());
-        produtoEntity.setDataCadastro(produto.getDataCdastro());
-        produtoEntity.setAtivo(produto.getAtivo());
-
-        produtoRepository.save(produtoEntity);
-
-        return new ResponseEntity<>(produto, HttpStatus.CREATED);
-    }
-    @PutMapping("/{id}")
-    public ResponseEntity<Produto> atualizarProduto(@PathVariable Long id, @RequestBody Produto produtoAtualizado) {
-
-        ProdutoEntity produtoEntity = produtoRepository.getReferenceById(id);
-
-        if(produtoEntity != null) {
-            produtoEntity.setNome(produtoAtualizado.getNome());
-            produtoRepository.save(produtoEntity);
-            return new ResponseEntity<>(produtoAtualizado, HttpStatus.CREATED);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarProduto(@PathVariable Long id) {
-
-        ProdutoEntity produtoEntity = produtoRepository.getReferenceById(id);
-
-        if(produtoEntity != null) {
-            produtoRepository.delete(produtoEntity);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
+   @PostMapping
+    public ResponseEntity<Produto> criar (@RequestBody Produto produto){
+       Object Produto;
+       Produto produtoCriado = createProdutoUseCase.criar(produto);
+       return new ResponseEntity<>(produtoCriado, HttpStatus.CREATED);
+   }
 }
