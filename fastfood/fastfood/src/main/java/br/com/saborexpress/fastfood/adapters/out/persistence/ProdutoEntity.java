@@ -40,4 +40,8 @@ public class ProdutoEntity {
 
     @Column(nullable = false)
     private boolean ativo ;
+
+    public ProdutoEntity() {
+
+    }
 }

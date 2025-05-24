@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/produtos")
@@ -21,18 +20,18 @@ public class ProdutoController {
     ProdutoRepository produtoRepository;
 
     @GetMapping
-    public List<ProdutoEntity> listarClientes() {
+    public List<ProdutoEntity> listarProdutos() {
         List<ProdutoEntity> produtos = produtoRepository.findAll();
         return produtos;
     }
     @GetMapping("/{id}")
-    public ResponseEntity<Produto> obterProduto(@PathVariable UUID id) {
+    public ResponseEntity<Produto> obterProduto(@PathVariable Long id) {
 
         ProdutoEntity produtoEntity = produtoRepository.getReferenceById(id);
 
         if(produtoEntity != null) {
             Produto produto = new Produto(produtoEntity.getId(), produtoEntity.getNome(), produtoEntity.getCategoria(),produtoEntity.getDescricao(), produtoEntity.getPreco(),
-                    produtoEntity.getFotoBase64(), produtoEntity.getDataCadastro(), produtoEntity.getDataCadastro(), produtoEntity.isAtivo() );
+                    produtoEntity.getFotoBase64(), produtoEntity.getDataCadastro(), produtoEntity.isAtivo() );
             return new ResponseEntity<>(produto, HttpStatus.OK);
         }
 
@@ -40,7 +39,7 @@ public class ProdutoController {
     }
 
     @PostMapping
-    public ResponseEntity<Produto> criarCliente(@RequestBody Produto produto) {
+    public ResponseEntity<Produto> criarProduto(@RequestBody Produto produto) {
         ProdutoEntity produtoEntity = new ProdutoEntity();
         produtoEntity.setNome(produto.getNome());
         produtoEntity.setCategoria(produto.getCategoria());
@@ -62,8 +61,21 @@ public class ProdutoController {
         if(produtoEntity != null) {
             produtoEntity.setNome(produtoAtualizado.getNome());
             produtoRepository.save(produtoEntity);
-            return new ResponseEntity<>(clienteAtualizado, HttpStatus.CREATED);
+            return new ResponseEntity<>(produtoAtualizado, HttpStatus.CREATED);
         }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarProduto(@PathVariable Long id) {
+
+        ProdutoEntity produtoEntity = produtoRepository.getReferenceById(id);
+
+        if(produtoEntity != null) {
+            produtoRepository.delete(produtoEntity);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
