@@ -1,4 +1,9 @@
 package br.com.saborexpress.fastfood.application.port.in;
 
-public class CreateProdutoUseCase {
+import br.com.saborexpress.fastfood.domain.Produto;
+
+public interface CreateProdutoUseCase {
+
+    Produto criar(Produto cliente);
+
 }

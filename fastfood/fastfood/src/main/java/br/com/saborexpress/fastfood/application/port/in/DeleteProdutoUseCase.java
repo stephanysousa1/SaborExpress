@@ -1,4 +1,7 @@
 package br.com.saborexpress.fastfood.application.port.in;
 
-public class DeleteProdutoUseCase {
+import java.util.UUID;
+
+public interface DeleteProdutoUseCase {
+    void excluir (UUID idProduto);
 }
